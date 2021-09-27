@@ -7,10 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"drehnstrom.com/go-pets/petsdb"
 )
 
-var projectID string 
+var projectID string
 
 func main() {
 	projectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
@@ -36,21 +37,22 @@ func main() {
 	mux.HandleFunc("/", indexHandler)
 	mux.HandleFunc("/about", aboutHandler)
 
-
 	log.Printf("Webserver listening on Port: %s", port)
 	http.ListenAndServe(":"+port, mux)
 }
-	
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var pets []petsdb.Pet
 	pets, error := petsdb.GetPets()
 	if error != nil {
 		fmt.Print(error)
+	} else {
+		fmt.Printf("There are %d Pets stored\n", len(pets))
 	}
 
 	data := HomePageData{
 		PageTitle: "Pets Home Page",
-		Pets: pets,
+		Pets:      pets,
 	}
 
 	var tpl = template.Must(template.ParseFiles("templates/index.html", "templates/layout.html"))
@@ -89,11 +91,10 @@ func aboutHandler(w http.ResponseWriter, r *http.Request) {
 // HomePageData for Index template
 type HomePageData struct {
 	PageTitle string
-	Pets []petsdb.Pet
+	Pets      []petsdb.Pet
 }
 
 // AboutPageData for About template
 type AboutPageData struct {
 	PageTitle string
 }
-
